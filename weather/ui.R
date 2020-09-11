@@ -8,8 +8,6 @@
 #
 
 library(shiny)
-library(dplyr)
-library(ggplot2)
 library(plotly)
 
 # Define UI for application that draws a histogram
