@@ -3,7 +3,6 @@ library(dplyr)
 library(ggplot2)
 library(bigrquery)
 library(DBI)
-library(plotly)
 
 # Define server logic required to draw a histogram
 function(input, output) {
@@ -45,12 +44,12 @@ function(input, output) {
     
   })
   
-  output$linePlot <- renderPlot({
+  output$linePlot <- plotly::renderPlotly(
     rval_data() %>%
       # filter(station %in% input$station) %>%
       ggplot(aes(x=date_day, y=temp_F_mean)) +
-      geom_line(aes(color = station))
-  })
+        geom_line(aes(color = station))
+  )
   
   output$weather_table <- DT::renderDT({
     rval_data() %>% 

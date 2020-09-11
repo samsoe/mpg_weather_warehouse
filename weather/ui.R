@@ -40,7 +40,7 @@ fluidPage(
     ),
     mainPanel(
       tabsetPanel(type = "tabs",
-                  tabPanel("Plot", plotOutput("linePlot")),
+                  tabPanel("Plot", plotlyOutput("linePlot")),
                   tabPanel("Table", DT::DTOutput("weather_table"))
                   # tabPanel("About", textOutput("about"))
       )
