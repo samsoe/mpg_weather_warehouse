@@ -51,9 +51,10 @@ function(input, output) {
   )
   
   output$weather_table <- DT::renderDT({
-    rval_data() %>% 
+    rval_data() 
+      # %>% 
       # filter(station %in% input$station) %>%
-      select(date_day, station, temp_F_mean, temp_F_max, temp_F_min)
+      # select(date_day, station, temp_F_mean, temp_F_max, temp_F_min)
     })
   
   output$downloadData <- downloadHandler(
