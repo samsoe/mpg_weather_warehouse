@@ -67,9 +67,10 @@ function(input, output) {
   )
   
   observeEvent(input$about, {
+    url <- "https://docs.google.com/document/d/1WKzE0v4DiwlfKYjMvTEVgzp_-_6jAv4l4CAtqqy-aII/edit?usp=sharing"
     showModal(modalDialog(
       title = "About",
-      "Further documentation can be found here."
+      HTML("Further documentation can be found here: <a href=\"https://docs.google.com/document/d/1WKzE0v4DiwlfKYjMvTEVgzp_-_6jAv4l4CAtqqy-aII/edit?usp=sharing\">Readme Weather Data</a>")
     ))
   })
 }
