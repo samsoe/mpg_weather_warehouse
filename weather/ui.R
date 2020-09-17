@@ -1,22 +1,14 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
 library(plotly)
+install.packages("shinycssloaders")
+library(shinycssloaders)
 
-# Define UI for application that draws a histogram
+# Define UI for application
 fluidPage(
   
   # Application title
   titlePanel("MPG Ranch Weather"),
   
-  # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
       dateRangeInput("date_range", 
@@ -39,7 +31,7 @@ fluidPage(
     ),
     mainPanel(
       tabsetPanel(type = "tabs",
-                  tabPanel("Plot", plotlyOutput("linePlot")),
+                  tabPanel("Plot", plotlyOutput("linePlot") %>% withSpinner()),
                   tabPanel("Table", DT::DTOutput("weather_table"))
                   # tabPanel("About", textOutput("about"))
       )
