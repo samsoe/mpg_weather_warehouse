@@ -58,7 +58,7 @@ function(input, output) {
   
   output$downloadData <- downloadHandler(
     filename = function() {
-      paste('mpg_weather-', Sys.Date(), '.csv', sep='')
+      paste('mpg_weather-', input$date_range[1], '_', input$date_range[2], '.csv', sep='')
     },
     content = function(con) {
       write.csv(rval_data(), con)
