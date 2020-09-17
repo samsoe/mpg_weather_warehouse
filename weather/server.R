@@ -70,7 +70,7 @@ function(input, output) {
     url <- "https://docs.google.com/document/d/1WKzE0v4DiwlfKYjMvTEVgzp_-_6jAv4l4CAtqqy-aII/edit?usp=sharing"
     showModal(modalDialog(
       title = "About",
-      HTML("Further documentation can be found here: <a href=\"https://docs.google.com/document/d/1WKzE0v4DiwlfKYjMvTEVgzp_-_6jAv4l4CAtqqy-aII/edit?usp=sharing\">Readme Weather Data</a>")
+      HTML("Further documentation can be found here: <a href=\"https://docs.google.com/document/d/1WKzE0v4DiwlfKYjMvTEVgzp_-_6jAv4l4CAtqqy-aII/edit?usp=sharing\" target=\"_blank\">Readme Weather Data</a>")
     ))
   })
 }
