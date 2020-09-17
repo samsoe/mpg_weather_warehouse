@@ -1,6 +1,6 @@
 library(shiny)
 library(plotly)
-install.packages("shinycssloaders")
+# install.packages("shinycssloaders") # comment this out for shinyapps.io
 library(shinycssloaders)
 
 # Define UI for application
