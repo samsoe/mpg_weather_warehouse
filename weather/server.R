@@ -43,11 +43,18 @@ function(input, output) {
     
   })
   
-  output$linePlot <- plotly::renderPlotly(
+  output$linePlot_temp <- plotly::renderPlotly(
     rval_data() %>%
-      # filter(station %in% input$station) %>%
+      select(date_day, station, temp_F_mean) %>%
       ggplot(aes(x=date_day, y=temp_F_mean)) +
         geom_line(aes(color = station))
+  )
+  
+  output$linePlot_precip <- plotly::renderPlotly(
+    rval_data() %>%
+      select(date_day, station, precip_I_mean) %>%
+      ggplot(aes(x=date_day, y=precip_I_mean)) +
+      geom_line(aes(color = station))
   )
   
   output$weather_table <- DT::renderDT({

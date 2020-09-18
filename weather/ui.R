@@ -31,9 +31,9 @@ fluidPage(
     ),
     mainPanel(
       tabsetPanel(type = "tabs",
-                  tabPanel("Plot", plotlyOutput("linePlot") %>% withSpinner()),
-                  tabPanel("Table", DT::DTOutput("weather_table"))
-                  # tabPanel("About", textOutput("about"))
+                  tabPanel("Temperature", plotlyOutput("linePlot_temp") %>% withSpinner()),
+                  tabPanel("Precipitation", plotlyOutput("linePlot_precip") %>% withSpinner()),
+                  tabPanel("Table", DT::DTOutput("weather_table") %>% withSpinner())
       )
     )
   )
