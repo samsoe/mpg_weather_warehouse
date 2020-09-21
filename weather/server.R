@@ -47,14 +47,15 @@ function(input, output) {
     rval_data() %>%
       select(date_day, station, temp_F_mean) %>%
       ggplot(aes(x=date_day, y=temp_F_mean)) +
-        geom_line(aes(color = station))
+        geom_line(aes(colour = station))
   )
   
   output$linePlot_precip <- plotly::renderPlotly(
     rval_data() %>%
       select(date_day, station, precip_I_mean) %>%
-      ggplot(aes(x=date_day, y=precip_I_mean)) +
-      geom_line(aes(color = station))
+      filter(precip_I_mean > 0) %>%
+      ggplot(aes(x=date_day, y=precip_I_mean, color=station)) +
+        geom_point(position="jitter")
   )
   
   output$weather_table <- DT::renderDT({
