@@ -52,10 +52,12 @@ function(input, output) {
   
   output$linePlot_precip <- plotly::renderPlotly(
     rval_data() %>%
-      select(date_day, station, precip_I_mean) %>%
-      filter(precip_I_mean > 0) %>%
-      ggplot(aes(x=date_day, y=precip_I_mean, color=station)) +
-        geom_point(position="jitter")
+      select(date_day, station, precip_in_sum) %>%
+      filter(precip_in_sum > 0) %>% 
+      ggplot(aes(x=date_day, y=precip_in_sum, fill=station)) +
+      geom_bar(stat="identity", position="dodge") +
+      xlab("Dates by Day") +
+      ylab("Sum Precipitation (in)")
   )
   
   output$weather_table <- DT::renderDT({
