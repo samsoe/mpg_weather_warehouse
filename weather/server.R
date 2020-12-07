@@ -33,22 +33,14 @@ function(input, output) {
     # weather_db
     # weather <- dbGetQuery(con, sql)
   })
-
-  initial_load_data <- read_csv('./mpg_weather_daily-200921.csv')
-  load_state <- 0  
-
+  
+  # perform Filters
   rval_data <- reactive({
-    if (load_state == 0) {
-      initial_load_data %>%
-        filter(date_day >= input$date_range[1] &
-                 date_day <= input$date_range[2] &
-                 station %in% input$station)
-    } else {
-      rval_bq() %>%
-        filter(date_day >= input$date_range[1] &
-                 date_day <= input$date_range[2] &
-                 station %in% input$station)
-    }
+    rval_bq() %>%
+      filter(date_day >= input$date_range[1] &
+               date_day <= input$date_range[2] &
+               station %in% input$station)
+    
   })
   
   output$linePlot_temp <- plotly::renderPlotly(
@@ -60,11 +52,12 @@ function(input, output) {
   
   output$linePlot_precip <- plotly::renderPlotly(
     rval_data() %>%
-      select(date_day, station, precip_I_mean) %>%
-      filter(precip_I_mean > 0) %>%
-      ggplot(aes(x=date_day, y=precip_I_mean, color=station)) +
-        # geom_point(position="jitter")
-        geom_bar(stat="identity")
+      select(date_day, station, precip_in_sum) %>%
+      filter(precip_in_sum > 0) %>% 
+      ggplot(aes(x=date_day, y=precip_in_sum, fill=station)) +
+      geom_bar(stat="identity", position="dodge") +
+      xlab("Dates by Day") +
+      ylab("Sum Precipitation (in)")
   )
   
   output$weather_table <- DT::renderDT({
