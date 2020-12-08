@@ -38,8 +38,8 @@ function(input, output) {
   # perform Filters
   rval_data <- reactive({
     rval_bq() %>%
-      filter(date_day >= input$date_range[1] &
-               date_day <= input$date_range[2] &
+      filter(date_day >= min(input$date_range) &
+               date_day <= max(input$date_range) &
                station %in% input$station)
     
   })
