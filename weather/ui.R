@@ -19,7 +19,7 @@ fluidPage(
       selectInput("station",
                   "Select station:",
                   choices = c("Baldy Draw", "Baldy Summit", "Indian Ridge",
-                              "Orchard House", "Sainfoin Bench", "South Baldy Ridge"),
+                              "Orchard House", "Sanfoin Bench", "South Baldy Ridge"),
                   selected = "Orchard House",
                   multiple = TRUE),
       downloadButton("downloadData", "Download"),
