@@ -53,13 +53,16 @@ function(input, output) {
   
   output$precip_step <- plotly::renderPlotly(
     rval_data() %>%
-      arrange(date_day) %>% 
-      mutate(year = year(date_day), doy = yday(date_day)) %>% 
-      group_by(year, station) %>% 
-      mutate(precip_in = cumsum(precip_in_sum)) %>% 
-      ggplot(aes(x = doy, y = precip_in, group = as.factor(year))) +
-      geom_step(aes(color = as.factor(year)), size = 1.0) +
-      facet_wrap(vars(station))
+      arrange(date_day) %>%
+      mutate(year = year(date_day), doy = yday(date_day)) %>%
+      group_by(year, station) %>%
+      mutate(precip_in = cumsum(precip_in_sum)) %>%
+      ungroup() %>%
+      ggplot(aes(x = doy, y = precip_in, group = station)) +
+      geom_step(aes(color = station), size = 1.0) +
+      facet_wrap(vars(year)) +
+      labs(x = "day", y = "rainfall (inches)") +
+      theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75))
   )
   
   output$weather_table <- DT::renderDT({
