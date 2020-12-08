@@ -2,6 +2,7 @@ library(shiny)
 library(plotly)
 library(bigrquery)
 library(DBI)
+library(lubridate)
 
 # Define server logic required to draw a histogram
 function(input, output) {
@@ -58,6 +59,17 @@ function(input, output) {
       geom_bar(stat="identity", position="dodge") +
       xlab("Dates by Day") +
       ylab("Sum Precipitation (in)")
+  )
+  
+  output$precip_step <- plotly::renderPlotly(
+    rval_data() %>%
+      arrange(date_day) %>% 
+      mutate(year = year(date_day), doy = yday(date_day)) %>% 
+      group_by(year, station) %>% 
+      mutate(precip_in = cumsum(precip_in_sum)) %>% 
+      ggplot(aes(x = doy, y = precip_in, group = as.factor(year))) +
+      geom_step(aes(color = as.factor(year)), size = 1.0) +
+      facet_wrap(vars(station))
   )
   
   output$weather_table <- DT::renderDT({
