@@ -51,16 +51,6 @@ function(input, output) {
         geom_line(aes(colour = station))
   )
   
-  output$linePlot_precip <- plotly::renderPlotly(
-    rval_data() %>%
-      select(date_day, station, precip_in_sum) %>%
-      filter(precip_in_sum > 0) %>% 
-      ggplot(aes(x=date_day, y=precip_in_sum, fill=station)) +
-      geom_bar(stat="identity", position="dodge") +
-      xlab("Dates by Day") +
-      ylab("Sum Precipitation (in)")
-  )
-  
   output$precip_step <- plotly::renderPlotly(
     rval_data() %>%
       arrange(date_day) %>% 
@@ -74,9 +64,6 @@ function(input, output) {
   
   output$weather_table <- DT::renderDT({
     rval_data() 
-      # %>% 
-      # filter(station %in% input$station) %>%
-      # select(date_day, station, temp_F_mean, temp_F_max, temp_F_min)
     })
   
   output$downloadData <- downloadHandler(
