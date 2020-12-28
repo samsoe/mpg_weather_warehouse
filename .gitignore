@@ -6,3 +6,5 @@
 *.json
 *.Rproj
 weather/rsconnect/
+Dockerfile
+Dockerfile.bak
