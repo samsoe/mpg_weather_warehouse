@@ -15,10 +15,13 @@ library(plotly)
 library(lubridate)
 library(readr)
 library(DT)
+library(leaflet)
 ```
 
 ```{r load_data, include = FALSE}
 weather_df <- read_csv('mpg_weather-2013_2019.csv')
+
+stations_df <- read_csv('http://s3.amazonaws.com/assets.datacamp.com/production/course_6355/datasets/stations_data.csv')
 ```
 
 Column {data-width=250 .sidebar}
@@ -105,4 +108,15 @@ renderDataTable({
     options = list(scrollY = '400px')
   )
 })
+```
+
+### Map
+
+```{r}
+leaflet() %>%
+#  addTiles() %>%
+  setView(-114.001, 46.70, zoom = 13) %>%
+  addWMSTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+              layers = "OpenTopoMap")
+  #addMarkers(lat = stations_df$latitude, lng = stations_df$longitude)
 ```
