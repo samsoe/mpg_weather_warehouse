@@ -1,0 +1,108 @@
+---
+title: "MPG Ranch Weather"
+output:
+  flexdashboard::flex_dashboard: 
+    theme: bootstrap
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(plotly)
+# library(bigrquery)
+# library(DBI)
+library(lubridate)
+library(readr)
+library(DT)
+```
+
+```{r load_data, include = FALSE}
+weather_df <- read_csv('mpg_weather-2013_2019.csv')
+```
+
+Column {data-width=250 .sidebar}
+-----------------------------------------------------------------------
+```{r}
+
+dateRangeInput("date_range", 
+               label = "Date range",
+               start = "2019-01-01",
+               end = "2019-12-31",
+               max = Sys.Date() - 1)
+
+selectInput("station",
+            "Select station:",
+            choices = c("Baldy Draw", "Baldy Summit", "Indian Ridge",
+                        "Orchard House", "Sanfoin Bench", "South Baldy Ridge"),
+            selected = "Orchard House",
+            multiple = TRUE)
+
+show_weather_df <- reactive({
+  weather_df %>%
+    filter(date_day >= min(input$date_range) &
+         date_day <= max(input$date_range) &
+         station %in% input$station)
+})
+
+# Create placeholder for the downloadButton
+uiOutput("downloadUI")
+
+# Create the actual downloadButton
+output$downloadUI <- renderUI( {
+  downloadButton("downBtn", "mpg_weather .csv", style = "width:100%;")
+})
+
+# Add download handling
+output$downBtn <- downloadHandler(
+  filename = function() {
+    paste('mpg_weather-', min(input$date_range), '_', max(input$date_range), '.csv', sep='')
+  },
+  content = function(file) {
+    write.csv(show_weather_df(), file, row.names = FALSE)
+  }
+)
+```
+
+Column {.tabset}
+-----------------
+### Temperature
+
+```{r}
+renderPlot({
+  show_weather_df() %>%
+    select(date_day, station, temp_F_mean) %>%
+    ggplot(aes(x=date_day, y=temp_F_mean)) +
+    geom_line(aes(colour = station))
+})
+```
+
+### Precipitation
+
+```{r}
+renderPlot({
+  show_weather_df() %>%
+    arrange(date_day) %>%
+    mutate(year = year(date_day), doy = yday(date_day)) %>%
+    group_by(year, station) %>%
+    mutate(precip_in = cumsum(precip_in_sum)) %>%
+    ungroup() %>%
+    ggplot(aes(x = doy, y = precip_in, group = station)) +
+    geom_step(aes(color = station), size = 1.0) +
+    facet_wrap(vars(year)) +
+    labs(x = "day", y = "rainfall (inches)") +
+    theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75))
+})
+```
+
+### Table
+
+```{r}
+renderDataTable({
+  datatable(
+    show_weather_df(), 
+    rownames = FALSE,
+    options = list(scrollY = '400px')
+  )
+})
+```

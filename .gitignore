@@ -8,3 +8,5 @@
 weather/rsconnect/
 Dockerfile
 Dockerfile.bak
+*.log
+*.html
