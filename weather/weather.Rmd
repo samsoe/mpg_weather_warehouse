@@ -39,7 +39,7 @@ selectInput("station",
             "Select station:",
             choices = c("Baldy Draw", "Baldy Summit", "Indian Ridge",
                         "Orchard House", "Sanfoin Bench", "South Baldy Ridge"),
-            selected = "Orchard House",
+            selected = c("Baldy Summit", "Orchard House"),
             multiple = TRUE)
 
 sliderInput("day_slider", 
