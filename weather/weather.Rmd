@@ -101,7 +101,7 @@ renderPlot({
     group_by(year, station) %>%
     ungroup() %>%
     ggplot(aes(x=doy, y=temp_F_mean)) +
-    geom_line(aes(group = 1, colour = station)) +
+    geom_line(aes(colour = station)) +
     scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b")) +
     facet_grid(vars(year)) +
     theme(legend.position="top") +
