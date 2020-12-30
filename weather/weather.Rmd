@@ -21,7 +21,7 @@ library(leaflet)
 ```{r load_data, include = FALSE}
 weather_df <- read_csv('mpg_weather-2013_2019.csv')
 
-stations_df <- read_csv('http://s3.amazonaws.com/assets.datacamp.com/production/course_6355/datasets/stations_data.csv')
+stations_df <- read_csv('weather_station_location.csv')
 ```
 
 Column {data-width=250 .sidebar}
@@ -46,6 +46,11 @@ show_weather_df <- reactive({
     filter(date_day >= min(input$date_range) &
          date_day <= max(input$date_range) &
          station %in% input$station)
+})
+
+show_stations_df <- reactive({
+  stations_df %>%
+      filter(station %in% input$station)
 })
 
 # Create placeholder for the downloadButton
@@ -76,7 +81,9 @@ renderPlot({
   show_weather_df() %>%
     select(date_day, station, temp_F_mean) %>%
     ggplot(aes(x=date_day, y=temp_F_mean)) +
-    geom_line(aes(colour = station))
+    geom_line(aes(colour = station)) +
+    theme(legend.position="top") +
+    labs(color = "Station")
 })
 ```
 
@@ -94,7 +101,9 @@ renderPlot({
     geom_step(aes(color = station), size = 1.0) +
     facet_wrap(vars(year)) +
     labs(x = "day", y = "rainfall (inches)") +
-    theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75))
+    theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75)) +
+    theme(legend.position="top") +
+    labs(color = "Station")
 })
 ```
 
@@ -117,6 +126,6 @@ leaflet() %>%
 #  addTiles() %>%
   setView(-114.001, 46.70, zoom = 13) %>%
   addWMSTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-              layers = "OpenTopoMap")
-  #addMarkers(lat = stations_df$latitude, lng = stations_df$longitude)
+              layers = "OpenTopoMap") %>%
+  addMarkers(lat = stations_df$lat, lng = stations_df$long, popup = stations_df$station, label = stations_df$station)
 ```
