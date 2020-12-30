@@ -16,6 +16,7 @@ library(lubridate)
 library(readr)
 library(DT)
 library(leaflet)
+library(tibble)
 ```
 
 ```{r load_data, include = FALSE}
@@ -91,14 +92,22 @@ Column {.tabset data-width=750}
 ### Temperature
 
 ```{r}
+
 renderPlot({
   show_weather_df() %>%
     select(date_day, station, temp_F_mean) %>%
-    ggplot(aes(x=date_day, y=temp_F_mean)) +
-    geom_line(aes(colour = station)) +
+    arrange(date_day) %>%
+    mutate(year = year(date_day), doy = yday(date_day)) %>%
+    group_by(year, station) %>%
+    ungroup() %>%
+    ggplot(aes(x=doy, y=temp_F_mean)) +
+    geom_line(aes(group = 1, colour = station)) +
+    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b")) +
+    facet_grid(vars(year)) +
     theme(legend.position="top") +
     labs(color = "Station")
 })
+
 ```
 
 ### Precipitation
@@ -113,8 +122,9 @@ renderPlot({
     ungroup() %>%
     ggplot(aes(x = doy, y = precip_in, group = station)) +
     geom_step(aes(color = station), size = 1.0) +
-    facet_wrap(vars(year)) +
+    facet_grid(vars(year)) +
     labs(x = "day", y = "rainfall (inches)") +
+    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b")) +
     theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75)) +
     theme(legend.position="top") +
     labs(color = "Station")
