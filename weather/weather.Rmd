@@ -24,8 +24,8 @@ weather_df <- read_csv('mpg_weather-2013_2019.csv')
 stations_df <- read_csv('weather_station_location.csv')
 ```
 
-Column {data-width=250 .sidebar}
------------------------------------------------------------------------
+Sidebar {.sidebar data-width=250}
+=====================================
 ```{r}
 
 dateRangeInput("date_range", 
@@ -83,6 +83,9 @@ output$downBtn <- downloadHandler(
 )
 ```
 
+Plots
+=====================================
+
 Column {.tabset data-width=750}
 -----------------
 ### Temperature
@@ -118,7 +121,8 @@ renderPlot({
 })
 ```
 
-### Table
+Table
+=====================================
 
 ```{r}
 renderDataTable({
@@ -130,7 +134,8 @@ renderDataTable({
 })
 ```
 
-### Map
+Map
+=====================================
 
 ```{r}
 leaflet() %>%
@@ -141,7 +146,8 @@ leaflet() %>%
   addMarkers(lat = stations_df$lat, lng = stations_df$long, popup = stations_df$station, label = stations_df$station)
 ```
 
-### About
+About
+=====================================
 
 #### About
 This is text [link](http://www.example.com)
