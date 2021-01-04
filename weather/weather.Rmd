@@ -16,7 +16,6 @@ library(lubridate)
 library(readr)
 library(DT)
 library(leaflet)
-library(tibble)
 ```
 
 ```{r load_data, include = FALSE}
@@ -69,7 +68,7 @@ show_stations_df <- reactive({
 uiOutput("downloadUI")
 
 # Create the actual downloadButton
-output$downloadUI <- renderUI( {
+output$downloadUI <- renderUI({
   downloadButton("downBtn", "mpg_weather .csv", style = "width:100%;")
 })
 
