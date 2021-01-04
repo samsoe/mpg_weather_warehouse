@@ -152,7 +152,11 @@ leaflet() %>%
   setView(-114.001, 46.70, zoom = 13) %>%
   addWMSTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
               layers = "OpenTopoMap") %>%
-  addMarkers(lat = stations_df$lat, lng = stations_df$long, popup = stations_df$station, label = stations_df$station)
+  addMarkers(lat = stations_df$lat, lng = stations_df$long, 
+             popup = paste0(popup = paste0(
+                                      "<strong>Station: </strong>", stations_df$station, "<br>",
+                                      "<strong>Elevation: </strong>", stations_df$elevation, " ft")),
+             label = stations_df$station)
 ```
 
 About
