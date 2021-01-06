@@ -44,8 +44,8 @@ selectInput("station",
 sliderInput("day_slider", 
             label = "Day Range by Year:",
             min = 1, 
-            max = 360, 
-            value = c(1,360), 
+            max = 365, 
+            value = c(1,365), 
             step = 1)
 
 show_weather_df <- reactive({
