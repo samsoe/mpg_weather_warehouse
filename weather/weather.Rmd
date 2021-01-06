@@ -102,6 +102,8 @@ renderPlot({
     ggplot(aes(x=doy, y=temp_F_mean)) +
     geom_line(aes(colour = station)) +
     facet_grid(vars(year)) +
+    labs(x = "", y = "Temperature (F)") +
+    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
     theme(legend.position="top") +
     labs(color = "Station")
 })
@@ -121,7 +123,7 @@ renderPlot({
     ggplot(aes(x = doy, y = precip_in, group = station)) +
     geom_step(aes(color = station), size = 1.0) +
     facet_grid(vars(year)) +
-    labs(x = "day", y = "rainfall (inches)") +
+    labs(x = "", y = "Cumulative Rainfall (in)") +
     scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
     theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75)) +
     theme(legend.position="top") +
