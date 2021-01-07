@@ -52,8 +52,8 @@ sliderInput("day_slider",
 show_weather_df <- reactive({
   weather_df %>%
     filter(date_day >= min(input$date_range) &
-      date_day <= max(input$date_range) &
-      station %in% input$station) %>%
+            date_day <= max(input$date_range)) %>%
+    filter(station %in% if(is.null(input$station)) {'Orchard House'} else {input$station})  %>%
     mutate(doy = yday(date_day)) %>%
     filter(doy >= min(input$day_slider) &
              doy <= max(input$day_slider))
