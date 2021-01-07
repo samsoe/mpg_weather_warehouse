@@ -32,7 +32,8 @@ dateRangeInput("date_range",
                label = "Date range",
                start = "2013-01-01",
                end = "2020-12-31",
-               max = Sys.Date() - 1)
+               max = Sys.Date() - 1,
+               min = "2013-01-01")
 
 selectInput("station",
             "Select station:",
