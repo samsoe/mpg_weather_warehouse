@@ -19,7 +19,7 @@ library(leaflet)
 ```
 
 ```{r load_data, include = FALSE}
-weather_df <- read_csv('mpg_weather-2013_2019.csv')
+weather_df <- read_csv('mpg_weather-2013_2020.csv')
 
 stations_df <- read_csv('weather_station_location.csv')
 ```
@@ -30,8 +30,8 @@ Sidebar {.sidebar data-width=250}
 
 dateRangeInput("date_range", 
                label = "Date range",
-               start = "2019-01-01",
-               end = "2019-12-31",
+               start = "2013-01-01",
+               end = "2020-12-31",
                max = Sys.Date() - 1)
 
 selectInput("station",
