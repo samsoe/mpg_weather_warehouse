@@ -7,7 +7,6 @@
 *.Rproj
 weather/rsconnect/
 weather/bak/*
-Dockerfile
 Dockerfile.bak
 *.swp
 *.log
