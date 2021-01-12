@@ -6,5 +6,8 @@
 *.json
 *.Rproj
 weather/rsconnect/
-Dockerfile
+weather/bak/*
 Dockerfile.bak
+*.swp
+*.log
+*.html
