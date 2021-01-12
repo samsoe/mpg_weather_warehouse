@@ -1,0 +1,207 @@
+---
+title: "MPG Ranch Weather"
+output:
+  flexdashboard::flex_dashboard: 
+    theme: bootstrap
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(plotly)
+# library(bigrquery)
+# library(DBI)
+library(lubridate)
+library(readr)
+library(DT)
+library(leaflet)
+```
+
+```{r load_data, include = FALSE}
+weather_df <- read_csv('mpg_weather-2013_2020.csv')
+
+stations_df <- read_csv('weather_station_location.csv')
+```
+
+Sidebar {.sidebar data-width=250}
+=====================================
+```{r}
+
+dateRangeInput("date_range", 
+               label = "Date range",
+               start = "2013-01-01",
+               end = "2020-12-31",
+               max = Sys.Date() - 1,
+               min = "2013-01-01")
+
+selectInput("station",
+            "Select station:",
+            choices = c("Baldy Draw", "Baldy Summit", "Indian Ridge",
+                        "Orchard House", "Sanfoin Bench", "South Baldy Ridge"),
+            selected = c("Baldy Summit", "Orchard House"),
+            multiple = TRUE)
+
+sliderInput("day_slider", 
+            label = "Day Range by Year:",
+            min = 1, 
+            max = 365, 
+            value = c(1,365), 
+            step = 1)
+
+show_weather_df <- reactive({
+  weather_df %>%
+    filter(date_day >= min(input$date_range) &
+            date_day <= max(input$date_range)) %>%
+    filter(station %in% if(is.null(input$station)) {'Orchard House'} else {input$station})  %>%
+    mutate(doy = yday(date_day)) %>%
+    filter(doy >= min(input$day_slider) &
+             doy <= max(input$day_slider))
+        
+})
+
+show_stations_df <- reactive({
+  stations_df %>%
+      filter(station %in% input$station)
+})
+
+# Create placeholder for the downloadButton
+uiOutput("downloadUI")
+
+# Create the actual downloadButton
+output$downloadUI <- renderUI({
+  downloadButton("downBtn", "mpg_weather .csv", style = "width:100%;")
+})
+
+# Add download handling
+output$downBtn <- downloadHandler(
+  filename = function() {
+    paste('mpg_weather-', min(input$date_range), '_', max(input$date_range), '.csv', sep='')
+  },
+  content = function(file) {
+    write.csv(show_weather_df(), file, row.names = FALSE)
+  }
+)
+```
+
+Plots
+=====================================
+
+Column {.tabset data-width=750}
+-----------------
+### Temperature
+
+```{r}
+
+renderPlot({
+  show_weather_df() %>%
+    select(date_day, station, temp_F_mean) %>%
+    arrange(date_day) %>%
+    mutate(year = year(date_day), doy = yday(date_day)) %>%
+    group_by(year, station) %>%
+    ungroup() %>%
+    ggplot(aes(x=doy, y=temp_F_mean)) +
+    geom_line(aes(colour = station)) +
+    facet_grid(vars(year)) +
+    labs(x = "", y = "Temperature (F)") +
+    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    theme(legend.position="top") +
+    labs(color = "Station")
+})
+
+```
+
+### Precipitation
+
+```{r}
+renderPlot({
+  show_weather_df() %>%
+    arrange(date_day) %>%
+    mutate(year = year(date_day), doy = yday(date_day)) %>%
+    group_by(year, station) %>%
+    mutate(precip_in = cumsum(precip_in_sum)) %>%
+    ungroup() %>%
+    ggplot(aes(x = doy, y = precip_in, group = station)) +
+    geom_step(aes(color = station), size = 1.0) +
+    facet_grid(vars(year)) +
+    labs(x = "", y = "Cumulative Rainfall (in)") +
+    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75)) +
+    theme(legend.position="top") +
+    labs(color = "Station")
+})
+```
+
+Table
+=====================================
+
+```{r}
+renderDataTable({
+  datatable(
+    show_weather_df(), 
+    rownames = FALSE,
+    options = list(scrollY = '400px')
+  )
+})
+```
+
+Map
+=====================================
+
+```{r}
+leaflet() %>%
+#  addTiles() %>%
+  setView(-114.001, 46.70, zoom = 13) %>%
+  addWMSTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+              layers = "OpenTopoMap") %>%
+  addMarkers(lat = stations_df$lat, lng = stations_df$long, 
+             popup = paste0(popup = paste0(
+                                      "<strong>Station: </strong>", stations_df$station, "<br>",
+                                      "<strong>Elevation: </strong>", stations_df$elevation, " ft")),
+             label = stations_df$station)
+```
+
+About
+=====================================
+#### Intention
+The primary intention of this application is to provide insight and access to daily temperature and precipitation data available in the MPG Ranch Data Warehouse.
+
+
+#### Description
+The data is collected from six weather stations on MPG Ranch with elevations ranging from  3218 to 5994 ft. The stations record weather variables every 30 minutes. These observations are then loaded into the MPG Ranch Data Warehouse and compiled into daily values. The data currently represents 2013-01-01 to 2020-12-31.
+
+#### Technical Details
+##### Data
+Variables shown on this application
+
+* 'date_day' - date in ISO (yyyy-mm-dd)
+* 'doy' - numeric day of the year
+* 'station'	- weather station name
+* 'temp_F_max' - maximum temperature recorded during the day	
+* 'temp_F_min' - minimum temperature recorded during the day
+* 'temp_F_mean' - average temperature recorded during the day
+* 'precip_in_sum'	- total precipitation recorded during the day
+
+Many other weather variables are available. For a list and description, please see the [Readme](https://docs.google.com/document/d/1WKzE0v4DiwlfKYjMvTEVgzp_-_6jAv4l4CAtqqy-aII/edit?usp=sharing){target="_blank"}.
+
+##### Hardware
+
+The weather stations are made by Davis Instruments, model [Vantage Pro 2](https://www.davisinstruments.com/vantage-pro2/tech-specs/){target="_blank"}. The network infrastructure that facilitates the weather stations was designed and is maintained by Nick Franczyk and Gus Seward. 
+
+The Vantage Pro 2 weather stations collect the following data using the sensor types listed here:
+
+* Wind Speed
+  * Solid state magnetic sensor, in mph
+* Wind Direction
+  * Wind vane with potentiometer, in degrees
+* Rain amount
+  * Tipping spoon gauge in 0.01 inch increments
+  * Note that snow depth and snow water equivalent are not measured accurately by this sensor
+* Temperature
+   * PN Junction Silicon Diode, in Fahrenheit
+* Relative Humidity
+  * Film capacitor element, in percent
+
+
+##### Feedback
+Please let us know what you think about this application! Would you like to see a different data display? Would you like to see different data displayed? Please contact Beau and Erik. If you’d like to report bugs or issues, or would like to be involved with development, join us on [Github](https://github.com/samsoe/mpg_shiny/issues){target="_blank"}. 
