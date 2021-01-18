@@ -19,9 +19,9 @@ library(leaflet)
 ```
 
 ```{r load_data, include = FALSE}
-weather_df <- read_csv('mpg_weather-2013_2020.csv')
+weather_df <- read_csv('https://storage.googleapis.com/mpg-data-warehouse/weather_summaries/mpg_ranch_daily/weather_daily_cache.csv')
 
-stations_df <- read_csv('weather_station_location.csv')
+stations_df <- read_csv('https://storage.googleapis.com/mpg-data-warehouse/weather/MPG/station_meta/weather_station_location.csv')
 ```
 
 Sidebar {.sidebar data-width=250}
