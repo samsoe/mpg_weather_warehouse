@@ -31,7 +31,7 @@ Sidebar {.sidebar data-width=250}
 dateRangeInput("date_range", 
                label = "Date range",
                start = "2013-01-01",
-               end = "2020-12-31",
+               end = Sys.Date() - 1,
                max = Sys.Date() - 1,
                min = "2013-01-01")
 
