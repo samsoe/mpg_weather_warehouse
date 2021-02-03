@@ -204,4 +204,4 @@ The Vantage Pro 2 weather stations collect the following data using the sensor t
 
 
 ##### Feedback
-Please let us know what you think about this application! Would you like to see a different data display? Would you like to see different data displayed? Please contact Beau and Erik. If you’d like to report bugs or issues, or would like to be involved with development, join us on [Github](https://github.com/samsoe/mpg_shiny/issues){target="_blank"}. 
+Please let us know what you think about this application! Would you like to see a different data display? Would you like to see different data displayed? Please contact Beau and Erik. If you’d like to report bugs or issues, or would like to be involved with development, join us on [Github](https://github.com/samsoe/mpg_shiny/issues){target="_blank"}.  Known missing data is displayed here: [Link](https://datastudio.google.com/reporting/c55060be-c84b-4547-8556-5107f9a51813).
