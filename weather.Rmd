@@ -70,7 +70,7 @@ uiOutput("downloadUI")
 
 # Create the actual downloadButton
 output$downloadUI <- renderUI({
-  downloadButton("downBtn", "mpg_weather .csv", style = "width:100%;")
+  downloadButton("downBtn", "Download *.csv", style = "width:100%;")
 })
 
 # Add download handling
