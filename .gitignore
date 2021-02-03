@@ -5,7 +5,7 @@
 .Renviron
 *.json
 *.Rproj
-weather/rsconnect/
+rsconnect/
 weather/bak/*
 Dockerfile.bak
 *.swp
