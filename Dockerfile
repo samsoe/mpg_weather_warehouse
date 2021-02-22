@@ -29,4 +29,4 @@ RUN chmod -R 755 /bin
 EXPOSE 3838
 
 # run flexdashboard as localhost and on exposed port in Docker container
-CMD ["R", "-e", "rmarkdown::run('/bin/dashboard_example.Rmd', shiny_args = list(port = 3838, host = '0.0.0.0'))"]
+CMD ["R", "-e", "rmarkdown::run('/bin/weather.Rmd', shiny_args = list(port = 3838, host = '0.0.0.0'))"]
