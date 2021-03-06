@@ -23,7 +23,6 @@
 #' [Grange, S.K. (2014). Technical note : Averaging wind speeds and directions, 1–12](https://www.researchgate.net/publication/262766424_Technical_note_Averaging_wind_speeds_and_directions)
 #' 
 #' # Load necessary tools
-#+ libraries
 library(knitr)
 library(tidyverse)
 
@@ -34,13 +33,13 @@ library(tidyverse)
 #' either as text or as an integer in c(0, 15). Translating these stored variables into degrees will require translation. Note: we need to find out 
 #' whether the mapping used by Davis follows the following schema before implementing this script with real data.  
 
-#+ wind_direction
 wind_dir <-
   data.frame(
     wdir_integer = c(0:15),
     wdir_text = c("N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"),
     wdir_degree = c(22.5 * c(0:15))
   )
+
 #' ### Wind direction data translation
 #+ wind_direction_codes
 wind_dir %>% kable()
@@ -114,9 +113,13 @@ dir_vec <- c(310, 340, 355, 5, 15, 20)
 sp_vec = sample(2:7)
 u <- -sp_vec * sin(2 * pi * dir_vec / 360)
 v <- -sp_vec * cos(2 * pi * dir_vec / 360)
-## Should be close to 360 and not close to the average of `dir_vec`
-mean(dir_vec)
+
+#' The result should be close to 360 and not close to the average of `dir_vec`
+## Result of vector averaging:
 (atan2(mean(u), mean(v)) * 360 / 2 / pi) + 180
+## Arithmetic mean of vector:
+mean(dir_vec)
+
 
 #' ### Code simplification
 #' The code here could easily be streamlined into a unified block, but for implementation of this
