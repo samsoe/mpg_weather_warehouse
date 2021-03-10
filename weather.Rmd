@@ -132,6 +132,18 @@ renderPlot({
 })
 ```
 
+### Wind
+
+```{r}
+renderDataTable({
+  datatable(
+    show_weather_df(),
+    rownames = FALSE,
+    options = list(scrollY = '400px')
+  )
+})
+```
+
 Table
 =====================================
 
