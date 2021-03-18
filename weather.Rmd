@@ -10,8 +10,6 @@ runtime: shiny
 library(flexdashboard)
 library(shiny)
 library(plotly)
-# library(bigrquery)
-# library(DBI)
 library(lubridate)
 library(readr)
 library(DT)
