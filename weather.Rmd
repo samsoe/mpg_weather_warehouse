@@ -132,29 +132,6 @@ renderPlot({
 })
 ```
 
-### Wind Max
-
-```{r}
-renderPlotly({
-  p <- show_weather_df() %>%
-    select(date_day, station, wspd_max_mph) %>%
-    filter(wspd_max_mph < 90) %>%
-    arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
-    group_by(year, station) %>%
-    ungroup() %>%
-    ggplot(aes(x=doy, y=wspd_max_mph)) +
-    geom_line(aes(colour = station)) +
-    facet_grid(vars(year)) +
-    labs(x = "", y = "Max Wind (mph)") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
-    theme(legend.position="top") +
-    labs(color = "Station")
-  
-  ggplotly(p)
-})
-```
-
 ### Wind Mean
 
 ```{r}
