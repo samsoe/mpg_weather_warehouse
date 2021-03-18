@@ -152,6 +152,27 @@ renderPlot({
 })
 ```
 
+### Wind Direction
+
+```{r}
+renderPlot({
+  show_weather_df() %>%
+    select(date_day, station, wdir_deg_prevail) %>%
+    arrange(date_day) %>%
+    mutate(year = year(date_day), doy = yday(date_day)) %>%
+    group_by(year, station) %>%
+    ungroup() %>%
+    ggplot(aes(x=doy, y=wdir_deg_prevail)) +
+    geom_line(aes(colour = station)) +
+    facet_grid(vars(year)) +
+    labs(x = "", y = "Prevailing Wind Direction") +
+    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    theme(legend.position="top") +
+    labs(color = "Station")
+})
+```
+
+
 Table
 =====================================
 
