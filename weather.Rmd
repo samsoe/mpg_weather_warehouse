@@ -153,6 +153,8 @@ renderPlot({
 ### Wind Direction
 
 ```{r}
+ordinal_directions <- c('N', 'E', 'S', 'W', 'N')
+
 renderPlot({
   show_weather_df() %>%
     select(date_day, station, wdir_deg_prevail) %>%
@@ -165,6 +167,7 @@ renderPlot({
     facet_grid(vars(year)) +
     labs(x = "", y = "Prevailing Wind Direction") +
     scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_y_continuous(labels = ordinal_directions, breaks = (0:4) * 90, limits = c(0, 360)) +
     theme(legend.position="top") +
     labs(color = "Station")
 })
