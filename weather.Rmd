@@ -132,7 +132,7 @@ renderPlot({
 })
 ```
 
-### Wind Mean
+### Wind Speed
 
 ```{r}
 renderPlot({
@@ -145,7 +145,7 @@ renderPlot({
     ggplot(aes(x=doy, y=wspd_mph_mean)) +
     geom_line(aes(colour = station)) +
     facet_grid(vars(year)) +
-    labs(x = "", y = "Temperature (F)") +
+    labs(x = "", y = "Wind Speed Mean (mph)") +
     scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
     theme(legend.position="top") +
     labs(color = "Station")
