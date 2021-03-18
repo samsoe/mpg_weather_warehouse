@@ -182,7 +182,7 @@ renderDataTable({
   datatable(
     show_weather_df(), 
     rownames = FALSE,
-    options = list(scrollY = '400px')
+    options = list(scrollY = '400px', scrollX = TRUE)
   )
 })
 ```
