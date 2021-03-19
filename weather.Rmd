@@ -164,7 +164,7 @@ renderPlot({
     group_by(year, station) %>%
     ungroup() %>%
     ggplot(aes(x=doy, y=wdir_deg_prevail)) +
-    geom_line(aes(colour = station)) +
+    geom_point(aes(colour = station), alpha = 0.4) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Prevailing Wind Direction") +
     scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
