@@ -1,6 +1,5 @@
-# mpg_shiny
+# MPG Ranch Weather
 App is currently live at https://mpg-data.shinyapps.io/weather/
 
-## Branch: edit-about-page
-- Created BL 2021-03-23
-- Intended to edit text on the **About** page
+## About
+MPG Ranch has tools which display weather data, but none of them allow users to download data for their own use. In this application, users may filter, view, and *download* weather data from MPG Ranch weather stations.
