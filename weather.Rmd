@@ -95,12 +95,16 @@ renderPlot({
   show_weather_df() %>%
     select(date_day, station, temp_F_mean) %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
-    ggplot(aes(x=doy, y=temp_F_mean)) +
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
+    ggplot(aes(x=axis_date, y=temp_F_mean)) +
     geom_line(aes(colour = station)) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Temperature (F)") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     theme(legend.position="top") +
     labs(color = "Station")
 })
@@ -113,15 +117,19 @@ renderPlot({
 renderPlot({
   show_weather_df() %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
     group_by(year, station) %>%
     mutate(precip_in = cumsum(precip_in_sum)) %>%
     ungroup() %>%
-    ggplot(aes(x = doy, y = precip_in, group = station)) +
+    ggplot(aes(x = axis_date, y = precip_in, group = station)) +
     geom_step(aes(color = station), size = 1.0) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Cumulative Rainfall (in)") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75)) +
     theme(legend.position="top") +
     labs(color = "Station")
@@ -135,12 +143,16 @@ renderPlot({
   show_weather_df() %>%
     select(date_day, station, wspd_mph_mean) %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
-    ggplot(aes(x=doy, y=wspd_mph_mean)) +
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
+    ggplot(aes(x=axis_date, y=wspd_mph_mean)) +
     geom_line(aes(colour = station)) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Wind Speed Mean (mph)") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     theme(legend.position="top") +
     labs(color = "Station")
 })
@@ -155,12 +167,16 @@ renderPlot({
   show_weather_df() %>%
     select(date_day, station, wdir_deg_prevail) %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
-    ggplot(aes(x=doy, y=wdir_deg_prevail)) +
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
+    ggplot(aes(x=axis_date, y=wdir_deg_prevail)) +
     geom_point(aes(colour = station), alpha = 0.4) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Prevailing Wind Direction") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     scale_y_continuous(labels = ordinal_directions, breaks = (0:4) * 90, limits = c(0, 360)) +
     theme(legend.position="top") +
     labs(color = "Station")
