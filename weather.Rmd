@@ -43,25 +43,25 @@ selectInput("station",
 sliderInput("day_slider", 
             label = "Day Range by Year:",
             min = 1, 
-            max = 365, 
-            value = c(1,365), 
+            max = 366, 
+            value = c(1,366), 
             step = 1)
 
 show_weather_df <- reactive({
   weather_df %>%
     select(-X1) %>%
     filter(date_day >= min(input$date_range) &
-            date_day <= max(input$date_range)) %>%
+           date_day <= max(input$date_range)) %>%
     filter(station %in% if(is.null(input$station)) {'Orchard House'} else {input$station})  %>%
     mutate(doy = yday(date_day)) %>%
     filter(doy >= min(input$day_slider) &
-             doy <= max(input$day_slider))
+           doy <= max(input$day_slider))
         
 })
 
 show_stations_df <- reactive({
   stations_df %>%
-      filter(station %in% input$station)
+    filter(station %in% input$station)
 })
 
 # Create placeholder for the downloadButton
@@ -96,14 +96,16 @@ renderPlot({
   show_weather_df() %>%
     select(date_day, station, temp_F_mean) %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
-    group_by(year, station) %>%
-    ungroup() %>%
-    ggplot(aes(x=doy, y=temp_F_mean)) +
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
+    ggplot(aes(x=axis_date, y=temp_F_mean)) +
     geom_line(aes(colour = station)) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Temperature (F)") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     theme(legend.position="top") +
     labs(color = "Station")
 })
@@ -116,15 +118,19 @@ renderPlot({
 renderPlot({
   show_weather_df() %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
     group_by(year, station) %>%
     mutate(precip_in = cumsum(precip_in_sum)) %>%
     ungroup() %>%
-    ggplot(aes(x = doy, y = precip_in, group = station)) +
+    ggplot(aes(x = axis_date, y = precip_in, group = station)) +
     geom_step(aes(color = station), size = 1.0) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Cumulative Rainfall (in)") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75)) +
     theme(legend.position="top") +
     labs(color = "Station")
@@ -138,14 +144,16 @@ renderPlot({
   show_weather_df() %>%
     select(date_day, station, wspd_mph_mean) %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
-    group_by(year, station) %>%
-    ungroup() %>%
-    ggplot(aes(x=doy, y=wspd_mph_mean)) +
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
+    ggplot(aes(x=axis_date, y=wspd_mph_mean)) +
     geom_line(aes(colour = station)) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Wind Speed Mean (mph)") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     theme(legend.position="top") +
     labs(color = "Station")
 })
@@ -160,14 +168,16 @@ renderPlot({
   show_weather_df() %>%
     select(date_day, station, wdir_deg_prevail) %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
-    group_by(year, station) %>%
-    ungroup() %>%
-    ggplot(aes(x=doy, y=wdir_deg_prevail)) +
-    geom_line(aes(colour = station)) +
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
+    ggplot(aes(x=axis_date, y=wdir_deg_prevail)) +
+    geom_point(aes(colour = station), alpha = 0.4) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Prevailing Wind Direction") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     scale_y_continuous(labels = ordinal_directions, breaks = (0:4) * 90, limits = c(0, 360)) +
     theme(legend.position="top") +
     labs(color = "Station")
@@ -207,44 +217,14 @@ leaflet() %>%
 About
 =====================================
 #### Intention
-The primary intention of this application is to provide insight and access to daily temperature and precipitation data available in the MPG Ranch Data Warehouse.
-
+MPG Ranch has tools which display weather data, but none of them allow users to download data for their own use. In this application, users may filter, view, and *download* weather data from MPG Ranch weather stations.
 
 #### Description
-The data is collected from six weather stations on MPG Ranch with elevations ranging from  3218 to 5994 ft. The stations record weather variables every 30 minutes. These observations are then loaded into the MPG Ranch Data Warehouse and compiled into daily values. The data currently represents 2013-01-01 to 2020-12-31.
+The data are collected from six weather stations, ranging from 3218 to 5994 ft in elevation. The stations record weather variables every 30 minutes. These observations are then loaded into the MPG Ranch Data Warehouse and compiled into daily values. Data included here begin on January 1, 2013, and new data are appended daily.
 
-#### Technical Details
-##### Data
-Variables shown on this application
+Leap years have 366 days. Users should account for this when processing downloaded data. 
 
-* 'date_day' - date in ISO (yyyy-mm-dd)
-* 'doy' - numeric day of the year
-* 'station'	- weather station name
-* 'temp_F_max' - maximum temperature recorded during the day	
-* 'temp_F_min' - minimum temperature recorded during the day
-* 'temp_F_mean' - average temperature recorded during the day
-* 'precip_in_sum'	- total precipitation recorded during the day
+Known missing data are displayed [here](https://datastudio.google.com/reporting/c55060be-c84b-4547-8556-5107f9a51813){target="_blank"}.
 
-Many other weather variables are available. For a list and description, please see the [Readme](https://docs.google.com/document/d/1WKzE0v4DiwlfKYjMvTEVgzp_-_6jAv4l4CAtqqy-aII/edit?usp=sharing){target="_blank"}.
-
-##### Hardware
-
-The weather stations are made by Davis Instruments, model [Vantage Pro 2](https://www.davisinstruments.com/vantage-pro2/tech-specs/){target="_blank"}. The network infrastructure that facilitates the weather stations was designed and is maintained by Nick Franczyk and Gus Seward. 
-
-The Vantage Pro 2 weather stations collect the following data using the sensor types listed here:
-
-* Wind Speed
-  * Solid state magnetic sensor, in mph
-* Wind Direction
-  * Wind vane with potentiometer, in degrees
-* Rain amount
-  * Tipping spoon gauge in 0.01 inch increments
-  * Note that snow depth and snow water equivalent are not measured accurately by this sensor
-* Temperature
-   * PN Junction Silicon Diode, in Fahrenheit
-* Relative Humidity
-  * Film capacitor element, in percent
-
-
-##### Feedback
-Please let us know what you think about this application! Would you like to see a different data display? Would you like to see different data displayed? Please contact Beau and Erik. If you’d like to report bugs or issues, or would like to be involved with development, join us on [Github](https://github.com/samsoe/mpg_shiny/issues){target="_blank"}.  Known missing data is displayed here: [Link](https://datastudio.google.com/reporting/c55060be-c84b-4547-8556-5107f9a51813).
+#### Feedback
+Please let Beau or Erik know what you think about this application. We appreciate suggestions. Please contact Beau and Erik. If you would like to report bugs or issues, or would like to be involved with development, join us on [GitHub](https://github.com/samsoe/mpg_shiny/issues){target="_blank"}. 
