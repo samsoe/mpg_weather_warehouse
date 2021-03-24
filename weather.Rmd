@@ -43,24 +43,25 @@ selectInput("station",
 sliderInput("day_slider", 
             label = "Day Range by Year:",
             min = 1, 
-            max = 365, 
-            value = c(1,365), 
+            max = 366, 
+            value = c(1,366), 
             step = 1)
 
 show_weather_df <- reactive({
   weather_df %>%
+    select(-X1) %>%
     filter(date_day >= min(input$date_range) &
-            date_day <= max(input$date_range)) %>%
+           date_day <= max(input$date_range)) %>%
     filter(station %in% if(is.null(input$station)) {'Orchard House'} else {input$station})  %>%
     mutate(doy = yday(date_day)) %>%
     filter(doy >= min(input$day_slider) &
-             doy <= max(input$day_slider))
+           doy <= max(input$day_slider))
         
 })
 
 show_stations_df <- reactive({
   stations_df %>%
-      filter(station %in% input$station)
+    filter(station %in% input$station)
 })
 
 # Create placeholder for the downloadButton
@@ -95,14 +96,16 @@ renderPlot({
   show_weather_df() %>%
     select(date_day, station, temp_F_mean) %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
-    group_by(year, station) %>%
-    ungroup() %>%
-    ggplot(aes(x=doy, y=temp_F_mean)) +
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
+    ggplot(aes(x=axis_date, y=temp_F_mean)) +
     geom_line(aes(colour = station)) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Temperature (F)") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     theme(legend.position="top") +
     labs(color = "Station")
 })
@@ -115,20 +118,72 @@ renderPlot({
 renderPlot({
   show_weather_df() %>%
     arrange(date_day) %>%
-    mutate(year = year(date_day), doy = yday(date_day)) %>%
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
     group_by(year, station) %>%
     mutate(precip_in = cumsum(precip_in_sum)) %>%
     ungroup() %>%
-    ggplot(aes(x = doy, y = precip_in, group = station)) +
+    ggplot(aes(x = axis_date, y = precip_in, group = station)) +
     geom_step(aes(color = station), size = 1.0) +
     facet_grid(vars(year)) +
     labs(x = "", y = "Cumulative Rainfall (in)") +
-    scale_x_continuous(labels = function(x) format(as.Date(as.character(x), "%j"), "%b-%d")) +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
     theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75)) +
     theme(legend.position="top") +
     labs(color = "Station")
 })
 ```
+
+### Wind Speed
+
+```{r}
+renderPlot({
+  show_weather_df() %>%
+    select(date_day, station, wspd_mph_mean) %>%
+    arrange(date_day) %>%
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
+    ggplot(aes(x=axis_date, y=wspd_mph_mean)) +
+    geom_line(aes(colour = station)) +
+    facet_grid(vars(year)) +
+    labs(x = "", y = "Wind Speed Mean (mph)") +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
+    theme(legend.position="top") +
+    labs(color = "Station")
+})
+```
+
+### Wind Direction
+
+```{r}
+ordinal_directions <- c('N', 'E', 'S', 'W', 'N')
+
+renderPlot({
+  show_weather_df() %>%
+    select(date_day, station, wdir_deg_prevail) %>%
+    arrange(date_day) %>%
+    mutate(
+      year = year(date_day), 
+      doy = yday(date_day),
+      axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
+      ) %>%
+    ggplot(aes(x=axis_date, y=wdir_deg_prevail)) +
+    geom_point(aes(colour = station), alpha = 0.4) +
+    facet_grid(vars(year)) +
+    labs(x = "", y = "Prevailing Wind Direction") +
+    scale_x_date(labels = function(x) format(x, "%b-%d")) +
+    scale_y_continuous(labels = ordinal_directions, breaks = (0:4) * 90, limits = c(0, 360)) +
+    theme(legend.position="top") +
+    labs(color = "Station")
+})
+```
+
 
 Table
 =====================================
@@ -136,9 +191,9 @@ Table
 ```{r}
 renderDataTable({
   datatable(
-    show_weather_df(), 
+    show_weather_df() %>% select(-doy), 
     rownames = FALSE,
-    options = list(scrollY = '400px')
+    options = list(scrollY = '400px', scrollX = TRUE)
   )
 })
 ```
@@ -166,6 +221,8 @@ MPG Ranch has tools which display weather data, but none of them allow users to 
 
 #### Description
 The data are collected from six weather stations, ranging from 3218 to 5994 ft in elevation. The stations record weather variables every 30 minutes. These observations are then loaded into the MPG Ranch Data Warehouse and compiled into daily values. Data included here begin on January 1, 2013, and new data are appended daily.
+
+Leap years have 366 days. Users should account for this when processing downloaded data. 
 
 Known missing data are displayed [here](https://datastudio.google.com/reporting/c55060be-c84b-4547-8556-5107f9a51813){target="_blank"}.
 
