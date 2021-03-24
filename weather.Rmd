@@ -50,17 +50,17 @@ sliderInput("day_slider",
 show_weather_df <- reactive({
   weather_df %>%
     filter(date_day >= min(input$date_range) &
-            date_day <= max(input$date_range)) %>%
+           date_day <= max(input$date_range)) %>%
     filter(station %in% if(is.null(input$station)) {'Orchard House'} else {input$station})  %>%
     mutate(doy = yday(date_day)) %>%
     filter(doy >= min(input$day_slider) &
-             doy <= max(input$day_slider))
+           doy <= max(input$day_slider))
         
 })
 
 show_stations_df <- reactive({
   stations_df %>%
-      filter(station %in% input$station)
+    filter(station %in% input$station)
 })
 
 # Create placeholder for the downloadButton
@@ -96,8 +96,6 @@ renderPlot({
     select(date_day, station, temp_F_mean) %>%
     arrange(date_day) %>%
     mutate(year = year(date_day), doy = yday(date_day)) %>%
-    group_by(year, station) %>%
-    ungroup() %>%
     ggplot(aes(x=doy, y=temp_F_mean)) +
     geom_line(aes(colour = station)) +
     facet_grid(vars(year)) +
@@ -138,8 +136,6 @@ renderPlot({
     select(date_day, station, wspd_mph_mean) %>%
     arrange(date_day) %>%
     mutate(year = year(date_day), doy = yday(date_day)) %>%
-    group_by(year, station) %>%
-    ungroup() %>%
     ggplot(aes(x=doy, y=wspd_mph_mean)) +
     geom_line(aes(colour = station)) +
     facet_grid(vars(year)) +
@@ -160,8 +156,6 @@ renderPlot({
     select(date_day, station, wdir_deg_prevail) %>%
     arrange(date_day) %>%
     mutate(year = year(date_day), doy = yday(date_day)) %>%
-    group_by(year, station) %>%
-    ungroup() %>%
     ggplot(aes(x=doy, y=wdir_deg_prevail)) +
     geom_point(aes(colour = station), alpha = 0.4) +
     facet_grid(vars(year)) +
