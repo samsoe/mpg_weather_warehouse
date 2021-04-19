@@ -104,7 +104,7 @@ renderPlot({
       ) %>%
     ggplot(aes(x=axis_date, y=temp_F_mean)) +
     geom_line(aes(colour = station), size = 0.8) +
-    facet_grid(vars(year)) +
+    facet_grid(vars(year), as.table = FALSE) +
     labs(x = "", y = "Temperature (F)") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     scale_color_discrete_sequential(name = "Station", palette = "Viridis") +
@@ -130,7 +130,7 @@ renderPlot({
     ungroup() %>%
     ggplot(aes(x = axis_date, y = precip_in, group = station)) +
     geom_step(aes(color = station), size = 0.8) +
-    facet_grid(vars(year)) +
+    facet_grid(vars(year), as.table = FALSE) +
     labs(x = "", y = "Cumulative Rainfall (in)") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     scale_color_discrete_sequential(name = "Station", palette = "Viridis") +
@@ -153,7 +153,7 @@ renderPlot({
       ) %>%
     ggplot(aes(x=axis_date, y=wspd_mph_mean)) +
     geom_line(aes(colour = station), size = 0.8) +
-    facet_grid(vars(year)) +
+    facet_grid(vars(year), as.table = FALSE) +
     labs(x = "", y = "Wind Speed Mean (mph)") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     scale_color_discrete_sequential(name = "Station", palette = "Viridis") +
@@ -178,7 +178,7 @@ renderPlot({
       ) %>%
     ggplot(aes(x=axis_date, y=wdir_deg_prevail)) +
     geom_point(aes(fill = station), shape = 21, color = "black", stroke = 0.4, alpha = 0.6, size = 1.2) +
-    facet_grid(vars(year)) +
+    facet_grid(vars(year), as.table = FALSE) +
     labs(x = "", y = "Prevailing Wind Direction") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     scale_y_continuous(labels = ordinal_directions, breaks = (0:4) * 90, limits = c(0, 360)) +
