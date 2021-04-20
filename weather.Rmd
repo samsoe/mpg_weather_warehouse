@@ -25,7 +25,7 @@ stations_df <- read_csv('https://storage.googleapis.com/mpg-data-warehouse/weath
 pal <- sequential_hcl(palette = "Batlow", n = 6)
 
 station_cols <- scale_color_manual(
-  name = "Stations",
+  name = "Stations:",
   values = c("Baldy Draw" = pal[1], 
              "Baldy Summit" = pal[2], 
              "Indian Ridge" = pal[3], 
@@ -153,7 +153,7 @@ renderPlot({
     ggplot(aes(x = axis_date, y = precip_in, group = station)) +
     geom_step(aes(color = station), size = 0.8) +
     facet_grid(vars(year), as.table = FALSE) +
-    labs(x = "", y = "Cumulative Rainfall (in)") +
+    labs(x = "", y = "Cumulative Rainfall (in)", caption = "The weather stations do not measure snow-water-equivalent. Values shown here depict rainfall, with trivial contributions from snow.") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     station_cols +
     theme_bw() +
@@ -199,7 +199,7 @@ renderPlot({
       axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
       ) %>%
     ggplot(aes(x=axis_date, y=wdir_deg_prevail, group = station)) +
-    geom_point(aes(fill = station), shape = 21, color = "black", stroke = 0.4, alpha = 0.6, size = 1.5) +
+    geom_point(aes(fill = station), shape = 21, color = "black", stroke = 0.4, alpha = 0.7, size = 1.6) +
     facet_grid(vars(year), as.table = FALSE) +
     labs(x = "", y = "Prevailing Wind Direction") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
