@@ -2,7 +2,7 @@
 title: "MPG Ranch Weather"
 output:
   flexdashboard::flex_dashboard: 
-    theme: bootstrap
+    theme: spacelab
 runtime: shiny
 ---
 
@@ -43,6 +43,23 @@ station_fills <- scale_fill_manual(
              "Sanfoin Bench" = pal[5], 
              "South Baldy Ridge" = pal[6])
 )
+
+theme_text_col = "gray35"
+theme_weather =
+  theme_bw() +
+  theme(
+    axis.title.y = element_text(size = 12, color = theme_text_col, margin = unit(c(t = 0, r = 4, b = 0, l = 0 ), "mm")),
+    axis.text.x = element_text(size = 10, color = theme_text_col, margin = unit(c(t = 4, r = 0, b = 0, l = 0 ), "mm")),
+    axis.text.y = element_text(size = 10, color = theme_text_col, margin = unit(c(t = 0, r = 3, b = 0, l = 0 ), "mm")),
+    axis.ticks.length = unit(-1.5, "mm"),
+    strip.text = element_text(size = 12, color = "gray15"),
+    strip.background = element_rect(fill = "lightsteelblue2"),
+    plot.caption = element_text(size = 10, color = theme_text_col),
+    legend.text = element_text(size = 12, color = theme_text_col), 
+    legend.title = element_text(size = 12, color = theme_text_col),
+    legend.position = "top", 
+    panel.grid.minor = element_blank()
+  )
 ```
 
 Sidebar {.sidebar data-width=250}
@@ -127,11 +144,10 @@ renderPlot({
     ggplot(aes(x=axis_date, y=temp_F_mean)) +
     geom_line(aes(colour = station), size = 0.8) +
     facet_grid(vars(year), as.table = FALSE) +
-    labs(x = "", y = "Temperature (F)") +
+    labs(x = "", y = expression(Average~Temperature~"("*degree*F*")")) +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     station_cols +
-    theme_bw() +
-    theme(legend.position="top", panel.grid.minor = element_blank())
+    theme_weather 
 })
 
 ```
@@ -153,11 +169,10 @@ renderPlot({
     ggplot(aes(x = axis_date, y = precip_in, group = station)) +
     geom_step(aes(color = station), size = 0.8) +
     facet_grid(vars(year), as.table = FALSE) +
-    labs(x = "", y = "Cumulative Rainfall (in)", caption = "The weather stations do not measure snow-water-equivalent. Values shown here depict rainfall, with trivial contributions from snow.") +
+    labs(x = "", y = "Cumulative Rainfall (in)", caption = "Note: the weather stations do not measure snow-water-equivalent. Values shown here depict rainfall, with trivial contributions from snow.") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     station_cols +
-    theme_bw() +
-    theme(legend.position="top", panel.grid.minor = element_blank())
+    theme_weather
 })
 ```
 
@@ -176,11 +191,10 @@ renderPlot({
     ggplot(aes(x=axis_date, y=wspd_mph_mean)) +
     geom_line(aes(colour = station), size = 0.8) +
     facet_grid(vars(year), as.table = FALSE) +
-    labs(x = "", y = "Wind Speed Mean (mph)") +
+    labs(x = "", y = "Average Wind Speed (mph)") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     station_cols +
-    theme_bw() +
-    theme(legend.position="top", panel.grid.minor = element_blank())
+    theme_weather
 })
 ```
 
@@ -205,8 +219,7 @@ renderPlot({
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     scale_y_continuous(labels = ordinal_directions, breaks = (0:4) * 90, limits = c(0, 360)) +
     station_fills +
-    theme_bw() +
-    theme(legend.position="top", panel.grid.minor = element_blank())
+    theme_weather
 })
 ```
 
