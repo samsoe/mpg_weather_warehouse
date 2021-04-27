@@ -6,20 +6,21 @@ Beau Larkin
 # Description
 
 Wind direction is usually reported in degrees, which presents a problem
-for calculating averages. If the wind direction for a give time period
-varied bewteen 340 and 20 degrees, the average direction near north, but
-taking the average of 340 and 20 equals 180, or south. To produce a
+for calculating an average. For example, if the wind direction for a
+given period varied between 340 and 20 degrees, the average direction
+over that period should be near north (zero degrees), but taking the
+arithmetic average of 340 and 20 equals 180, or south. To produce a
 meaningful average of wind direction, we must use vector functions to
 decompose degrees into longitudinal and latitudinal dimensions,
 calculate the average (and/or a measure of variability), and recombine
 them to report the result in degrees.
 
-Simply calculating the vector average of wind direction will result in
-an incomplete average, however. We will also take into account the wind
-speed, which acts as a weight on direction. For example, if the wind
-blows gently from the east for half of a day, and strongly from the
-north for half of the day, we would expect the average to be closer to
-north than to east.
+Simply calculating the vector average of wind direction fails to take
+advantage of other information at our disposal, however. We will also
+take into account the wind speed, which acts as a weight on direction.
+For example, if the wind blows gently from the east for half of a day,
+and strongly from the north for half of the day, we would expect the
+average to be closer to north than to east.
 
 ## Citation
 
@@ -34,14 +35,14 @@ library(knitr)
 library(tidyverse)
 ```
 
-    ## ── Attaching packages ────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
 
-    ## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
-    ## ✓ tibble  3.0.3     ✓ dplyr   1.0.1
-    ## ✓ tidyr   1.1.1     ✓ stringr 1.4.0
-    ## ✓ readr   1.3.1     ✓ forcats 0.5.0
+    ## ✓ ggplot2 3.3.3     ✓ purrr   0.3.4
+    ## ✓ tibble  3.1.0     ✓ dplyr   1.0.5
+    ## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
+    ## ✓ readr   1.4.0     ✓ forcats 0.5.0
 
-    ## ── Conflicts ───────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -50,13 +51,13 @@ library(tidyverse)
 ## Wind directions
 
 We will be working with data obtained via API from [Davis Instruments
-Weatherlink](https://www.davisinstruments.com/weatherlink-cloud/). Our
+Weatherlink](https://www.davisinstruments.com/weatherlink-cloud/). The
 API returns wind direction data that are binned into 16 compass
 directions, and the compass directions are represented either as text or
-as an integer in c(0, 15). Translating these stored variables into
-degrees will require translation. Note: we need to find out whether the
-mapping used by Davis follows the following schema before implementing
-this script with real data.
+as an integer in \[0, 15\]. These integers must be translated into
+degree equivalents before other calculations can be made. We have
+confirmed with Davis Instruments that the integer values map to degrees
+in the order shown in the following code.
 
 ``` r
 wind_dir <-
@@ -94,7 +95,7 @@ wind_dir %>% kable()
 
 ### Example weather data
 
-Data used in this example includes 1000 rows, split into ten “days” with
+Data used in this example include 1000 rows, split into ten “days” with
 100 values for each day. Wind speed is sampled from an integer vector
 and for this example is unitless. The wind direction data are sampled
 from the `wind_dir` data frame.
@@ -111,11 +112,11 @@ weather_data <-
 
     ## Rows: 1,000
     ## Columns: 5
-    ## $ day          <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
-    ## $ wind_speed   <int> 7, 12, 1, 4, 17, 2, 3, 17, 14, 1, 4, 4, 3, 0, 0, 3, 8, 1…
-    ## $ wdir_integer <int> 11, 13, 13, 3, 11, 4, 12, 7, 2, 6, 8, 0, 8, 5, 2, 13, 10…
-    ## $ wdir_text    <chr> "WSW", "WNW", "WNW", "ENE", "WSW", "E", "W", "SSE", "NE"…
-    ## $ wdir_degree  <dbl> 247.5, 292.5, 292.5, 67.5, 247.5, 90.0, 270.0, 157.5, 45…
+    ## $ day          <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+    ## $ wind_speed   <int> 18, 10, 1, 4, 2, 5, 13, 11, 4, 8, 8, 16, 7, 9, 1, 14, 3, …
+    ## $ wdir_integer <int> 14, 5, 10, 7, 1, 7, 10, 15, 1, 5, 8, 8, 14, 2, 11, 13, 5,…
+    ## $ wdir_text    <chr> "NW", "ESE", "SW", "SSE", "NNE", "SSE", "SW", "NNW", "NNE…
+    ## $ wdir_degree  <dbl> 315.0, 112.5, 225.0, 157.5, 22.5, 157.5, 225.0, 337.5, 22…
 
 ### Vector averaging and results
 
@@ -135,13 +136,13 @@ weather_data %>% glimpse()
 
     ## Rows: 1,000
     ## Columns: 7
-    ## $ day          <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
-    ## $ wind_speed   <int> 7, 12, 1, 4, 17, 2, 3, 17, 14, 1, 4, 4, 3, 0, 0, 3, 8, 1…
-    ## $ wdir_integer <int> 11, 13, 13, 3, 11, 4, 12, 7, 2, 6, 8, 0, 8, 5, 2, 13, 10…
-    ## $ wdir_text    <chr> "WSW", "WNW", "WNW", "ENE", "WSW", "E", "W", "SSE", "NE"…
-    ## $ wdir_degree  <dbl> 247.5, 292.5, 292.5, 67.5, 247.5, 90.0, 270.0, 157.5, 45…
-    ## $ wdir_u       <dbl> 6.467157e+00, 1.108655e+01, 9.238795e-01, -3.695518e+00,…
-    ## $ wdir_v       <dbl> 2.678784e+00, -4.592201e+00, -3.826834e-01, -1.530734e+0…
+    ## $ day          <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+    ## $ wind_speed   <int> 18, 10, 1, 4, 2, 5, 13, 11, 4, 8, 8, 16, 7, 9, 1, 14, 3, …
+    ## $ wdir_integer <int> 14, 5, 10, 7, 1, 7, 10, 15, 1, 5, 8, 8, 14, 2, 11, 13, 5,…
+    ## $ wdir_text    <chr> "NW", "ESE", "SW", "SSE", "NNE", "SSE", "SW", "NNW", "NNE…
+    ## $ wdir_degree  <dbl> 315.0, 112.5, 225.0, 157.5, 22.5, 157.5, 225.0, 337.5, 22…
+    ## $ wdir_u       <dbl> 1.272792e+01, -9.238795e+00, 7.071068e-01, -1.530734e+00,…
+    ## $ wdir_v       <dbl> -1.272792e+01, 3.826834e+00, 7.071068e-01, 3.695518e+00, …
 
 ``` r
 ## Calculate the average of wind vectors, grouped by time (in this case, "day")
@@ -160,20 +161,20 @@ weather_summary %>% kable()
 
 | day | wind\_speed\_mean | wdir\_u\_mean | wdir\_v\_mean | wdir\_deg\_avg |
 |----:|------------------:|--------------:|--------------:|---------------:|
-|   1 |              8.05 |     1.3344228 |     0.3972995 |      253.42008 |
-|   2 |              9.31 |     1.0013527 |     0.7435443 |      233.40464 |
-|   3 |              8.85 |    -0.5893885 |    -1.3606381 |       23.42084 |
-|   4 |              9.97 |     1.0747253 |     0.2608611 |      256.35681 |
-|   5 |              9.42 |     0.2855054 |     0.1612130 |      240.54840 |
-|   6 |              8.38 |     0.4539446 |    -0.3957596 |      311.08269 |
-|   7 |              9.48 |     0.1344847 |    -0.0949312 |      305.21783 |
-|   8 |              9.75 |     1.2204521 |     0.0455732 |      267.86150 |
-|   9 |              8.65 |     0.4485593 |     0.9260219 |      205.84526 |
-|  10 |              8.17 |     0.2491467 |    -0.1142754 |      294.63937 |
+|   1 |              7.96 |    -0.0670350 |     0.6332023 |      173.95679 |
+|   2 |             10.43 |     0.1480622 |    -0.3395205 |      336.43836 |
+|   3 |              9.44 |    -0.7203740 |     0.1163207 |       99.17253 |
+|   4 |              8.54 |    -0.8312698 |    -1.0027136 |       39.65942 |
+|   5 |              7.90 |     0.5941624 |     0.0001448 |      269.98604 |
+|   6 |              8.67 |     0.7982103 |     0.6269406 |      231.85275 |
+|   7 |              9.12 |     1.0937407 |    -0.0001237 |      270.00648 |
+|   8 |              9.14 |    -0.4085479 |    -0.1993275 |       63.99260 |
+|   9 |              9.07 |    -0.2400419 |     0.9383821 |      165.65120 |
+|  10 |              9.15 |     0.5248598 |     0.5170898 |      225.42726 |
 
 It is possible to calculate the standard deviation of wind speed and
 wind direction, but implementing this will take additional work.
-Applying standard deviations to wind direction mean that the y axis in
+Applying standard deviations to wind direction means that the y axis in
 figures will extend above 360 and below 0, which seems inappropriate.
 For wind speed, we also will be able to display max and min wind speed,
 if desired, alleviating the need for a measure of variability.
@@ -230,7 +231,7 @@ The result should be close to 360 and not close to the average of
 (atan2(mean(u), mean(v)) * 360 / 2 / pi) + 180
 ```
 
-    ## [1] 1.201419
+    ## [1] 357.1237
 
 ``` r
 ## Arithmetic mean of vector:

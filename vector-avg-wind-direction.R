@@ -6,14 +6,16 @@
 #' ---
 
 #' # Description
-#' Wind direction is usually reported in degrees, which presents a problem for calculating averages. 
-#' If the wind direction for a give time period varied bewteen 340 and 20 degrees, the average direction
-#' near north, but taking the average of 340 and 20 equals 180, or south. To produce a meaningful average
+#' Wind direction is usually reported in degrees, which presents a problem for calculating an average. 
+#' For example, if the wind direction for a given period varied between 340 and 20 degrees, 
+#' the average direction over that period should be near north (zero degrees), 
+#' but taking the arithmetic average of 340 and 20 equals 180, or south. To produce a meaningful average
 #' of wind direction, we must use vector functions to decompose degrees into longitudinal and latitudinal 
 #' dimensions, calculate the average (and/or a measure of variability), and recombine them to report the 
 #' result in degrees. 
 #' 
-#' Simply calculating the vector average of wind direction will result in an incomplete average, however.
+#' Simply calculating the vector average of wind direction fails to take advantage of other 
+#' information at our disposal, however.
 #' We will also take into account the wind speed, which acts as a weight on direction. For example, if 
 #' the wind blows gently from the east for half of a day, and strongly from the north for half of the day,
 #' we would expect the average to be closer to north than to east. 
@@ -29,9 +31,10 @@ library(tidyverse)
 #' # Create data to motivate example
 #' ## Wind directions
 #' We will be working with data obtained via API from [Davis Instruments Weatherlink](https://www.davisinstruments.com/weatherlink-cloud/).
-#' Our API returns wind direction data that are binned into 16 compass directions, and the compass directions are represented 
-#' either as text or as an integer in c(0, 15). Translating these stored variables into degrees will require translation. Note: we need to find out 
-#' whether the mapping used by Davis follows the following schema before implementing this script with real data.  
+#' The API returns wind direction data that are binned into 16 compass directions, and the compass directions are represented 
+#' either as text or as an integer in [0, 15]. These integers must be translated into degree equivalents before
+#' other calculations can be made. We have confirmed with Davis Instruments that the integer values map to degrees 
+#' in the order shown in the following code.   
 
 wind_dir <-
   data.frame(
@@ -45,7 +48,7 @@ wind_dir <-
 wind_dir %>% kable()
 
 #' ### Example weather data
-#' Data used in this example includes 1000 rows, split into ten "days" with 100 values for each day.
+#' Data used in this example include 1000 rows, split into ten "days" with 100 values for each day.
 #' Wind speed is sampled from an integer vector and for this example is unitless. The wind direction
 #' data are sampled from the `wind_dir` data frame.
 
@@ -84,7 +87,7 @@ weather_summary %>% kable()
 
 #' It is possible to calculate the standard deviation of wind speed and wind direction, 
 #' but implementing this will take additional work. Applying standard deviations to wind 
-#' direction mean that the y axis in figures will extend above 360 and below 0, which seems
+#' direction means that the y axis in figures will extend above 360 and below 0, which seems
 #' inappropriate. For wind speed, we also will be able to display max and min wind speed, if desired,
 #' alleviating the need for a measure of variability. 
 #' 
