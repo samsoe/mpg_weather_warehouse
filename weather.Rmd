@@ -2,7 +2,7 @@
 title: "MPG Ranch Weather"
 output:
   flexdashboard::flex_dashboard: 
-    theme: bootstrap
+    theme: spacelab
 runtime: shiny
 ---
 
@@ -14,12 +14,52 @@ library(lubridate)
 library(readr)
 library(DT)
 library(leaflet)
+library(colorspace)
 ```
 
 ```{r load_data, include = FALSE}
 weather_df <- read_csv('https://storage.googleapis.com/mpg-data-warehouse/weather_summaries/mpg_ranch_daily/weather_daily_cache.csv')
 
 stations_df <- read_csv('https://storage.googleapis.com/mpg-data-warehouse/weather/MPG/station_meta/weather_station_location.csv')
+
+pal <- sequential_hcl(palette = "Batlow", n = 6)
+
+station_cols <- scale_color_manual(
+  name = "Stations:",
+  values = c("Baldy Draw" = pal[1], 
+             "Baldy Summit" = pal[2], 
+             "Indian Ridge" = pal[3], 
+             "Orchard House" = pal[4], 
+             "Sanfoin Bench" = pal[5], 
+             "South Baldy Ridge" = pal[6])
+)
+
+station_fills <- scale_fill_manual(
+  name = "Stations",
+  values = c("Baldy Draw" = pal[1], 
+             "Baldy Summit" = pal[2], 
+             "Indian Ridge" = pal[3], 
+             "Orchard House" = pal[4], 
+             "Sanfoin Bench" = pal[5], 
+             "South Baldy Ridge" = pal[6])
+)
+
+theme_text_col = "gray35"
+theme_weather =
+  theme_bw() +
+  theme(
+    axis.title.y = element_text(size = 12, color = theme_text_col, margin = unit(c(t = 0, r = 4, b = 0, l = 0 ), "mm")),
+    axis.text.x = element_text(size = 10, color = theme_text_col, margin = unit(c(t = 4, r = 0, b = 0, l = 0 ), "mm")),
+    axis.text.y = element_text(size = 10, color = theme_text_col, margin = unit(c(t = 0, r = 3, b = 0, l = 0 ), "mm")),
+    axis.ticks.length = unit(-1.5, "mm"),
+    strip.text = element_text(size = 12, color = "gray15"),
+    strip.background = element_rect(fill = "lightsteelblue2"),
+    plot.caption = element_text(size = 10, color = theme_text_col),
+    legend.text = element_text(size = 12, color = theme_text_col), 
+    legend.title = element_text(size = 12, color = theme_text_col),
+    legend.position = "top", 
+    panel.grid.minor = element_blank()
+  )
 ```
 
 Sidebar {.sidebar data-width=250}
@@ -64,10 +104,10 @@ show_stations_df <- reactive({
     filter(station %in% input$station)
 })
 
-# Create placeholder for the downloadButton
+# Create placeholder for the download Button
 uiOutput("downloadUI")
 
-# Create the actual downloadButton
+# Create the actual download Button
 output$downloadUI <- renderUI({
   downloadButton("downBtn", "Download *.csv", style = "width:100%;")
 })
@@ -102,12 +142,12 @@ renderPlot({
       axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
       ) %>%
     ggplot(aes(x=axis_date, y=temp_F_mean)) +
-    geom_line(aes(colour = station)) +
-    facet_grid(vars(year)) +
-    labs(x = "", y = "Temperature (F)") +
+    geom_line(aes(colour = station), size = 0.8) +
+    facet_grid(vars(year), as.table = FALSE) +
+    labs(x = "", y = expression(Average~Temperature~"("*degree*F*")")) +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
-    theme(legend.position="top") +
-    labs(color = "Station")
+    station_cols +
+    theme_weather 
 })
 
 ```
@@ -127,13 +167,12 @@ renderPlot({
     mutate(precip_in = cumsum(precip_in_sum)) %>%
     ungroup() %>%
     ggplot(aes(x = axis_date, y = precip_in, group = station)) +
-    geom_step(aes(color = station), size = 1.0) +
-    facet_grid(vars(year)) +
-    labs(x = "", y = "Cumulative Rainfall (in)") +
+    geom_step(aes(color = station), size = 0.8) +
+    facet_grid(vars(year), as.table = FALSE) +
+    labs(x = "", y = "Cumulative Rainfall (in)", caption = "Note: the weather stations do not measure snow-water-equivalent. Values shown here depict rainfall, with trivial contributions from snow.") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
-    theme(panel.grid.major.y = element_line(color = "gray90", size = 0.75)) +
-    theme(legend.position="top") +
-    labs(color = "Station")
+    station_cols +
+    theme_weather
 })
 ```
 
@@ -150,12 +189,12 @@ renderPlot({
       axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
       ) %>%
     ggplot(aes(x=axis_date, y=wspd_mph_mean)) +
-    geom_line(aes(colour = station)) +
-    facet_grid(vars(year)) +
-    labs(x = "", y = "Wind Speed Mean (mph)") +
+    geom_line(aes(colour = station), size = 0.8) +
+    facet_grid(vars(year), as.table = FALSE) +
+    labs(x = "", y = "Average Wind Speed (mph)") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
-    theme(legend.position="top") +
-    labs(color = "Station")
+    station_cols +
+    theme_weather
 })
 ```
 
@@ -173,14 +212,14 @@ renderPlot({
       doy = yday(date_day),
       axis_date = as.Date(paste0("2000-",format(date_day, "%j")), "%Y-%j")
       ) %>%
-    ggplot(aes(x=axis_date, y=wdir_deg_prevail)) +
-    geom_point(aes(colour = station), alpha = 0.4) +
-    facet_grid(vars(year)) +
+    ggplot(aes(x=axis_date, y=wdir_deg_prevail, group = station)) +
+    geom_point(aes(fill = station), shape = 21, color = "black", stroke = 0.4, alpha = 0.7, size = 1.6) +
+    facet_grid(vars(year), as.table = FALSE) +
     labs(x = "", y = "Prevailing Wind Direction") +
     scale_x_date(labels = function(x) format(x, "%b-%d")) +
     scale_y_continuous(labels = ordinal_directions, breaks = (0:4) * 90, limits = c(0, 360)) +
-    theme(legend.position="top") +
-    labs(color = "Station")
+    station_fills +
+    theme_weather
 })
 ```
 
