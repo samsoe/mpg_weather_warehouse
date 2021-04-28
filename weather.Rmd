@@ -67,7 +67,7 @@ Sidebar {.sidebar data-width=250}
 ```{r}
 
 dateRangeInput("date_range", 
-               label = "Date range",
+               label = "Date range:",
                start = "2013-01-01",
                end = Sys.Date() - 1,
                max = Sys.Date() - 1,
