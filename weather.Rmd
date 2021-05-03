@@ -266,4 +266,4 @@ Leap years have 366 days. Users should account for this when processing download
 Known missing data are displayed [here](https://datastudio.google.com/reporting/c55060be-c84b-4547-8556-5107f9a51813){target="_blank"}.
 
 #### Feedback
-Please let Beau or Erik know what you think about this application. We appreciate suggestions. Please contact Beau and Erik. If you would like to report bugs or issues, or would like to be involved with development, join us on [GitHub](https://github.com/samsoe/mpg_shiny/issues){target="_blank"}. 
+We appreciate suggestions. Please contact Beau and Erik with any feedback. If you would like to report bugs or issues, or would like to be involved with development, join us on [GitHub](https://github.com/samsoe/mpg_shiny/issues){target="_blank"}. 
